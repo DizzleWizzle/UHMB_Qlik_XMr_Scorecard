@@ -1,0 +1,20 @@
+{
+    "name": "UHMB Scorecard Recalculations",
+    "description": "UHMB Scorecard extension with recalulation of limits",
+    "type": "visualization",
+    "version": "1.0.0",
+    "icon": "extension",
+    "author": "",
+    "homepage": "",
+    "keywords": "qlik-sense, visualization",
+    "license": "",
+    "repository": "",
+    "bundle": {
+        "id": "UHMB-bundle",
+        "name": "UHMB extensions",
+        "description": "This is a set of extensions built in-house at UHMB"
+    },
+    "dependencies": {
+        "qlik-sense": ">=3.0.x"
+    }
+}

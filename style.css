@@ -1,0 +1,65 @@
+.needed-for-unknown-reasons {
+}
+.qv-uhmb-ScoreCard{
+display: flex;
+  	flex-direction: column;
+}
+.qv-uhmb-ScoreCard .innerSC{
+	
+	flex: 1;
+	display: flex;
+  	flex-direction: column;
+	
+}
+
+.qv-uhmb-ScoreCard .innerSC .tableCont{
+	margin:5px;
+	flex: 1;
+}
+
+.qv-uhmb-ScoreCard .innerSC .bigTitleSC{
+	text-align:center;
+	font-size:35px;
+}
+.qv-uhmb-ScoreCard .innerSC .subTitleSC{
+	text-align:center;
+	font-size:15px;
+}
+
+
+div.qv-uhmb-ScoreCard  table td, div.qv-uhmb-ScoreCard  table th{
+  	border: 1px solid black;
+  	border-collapse: collapse;
+  	background-color: white;
+	vertical-align: middle;
+}
+
+div.qv-uhmb-ScoreCard  table{
+	height:100%;
+}
+
+
+div.qv-uhmb-ScoreCard  table td{
+	padding:2px;
+}
+
+
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes redflash {
+  0%   {background-color:salmon;}
+  50%  {background-color:white;}
+  100% {background-color:salmon;}
+
+}
+
+/* Standard syntax */
+@keyframes redflash {
+  0%   {background-color:salmon;}
+  50%  {background-color:white;}
+  100% {background-color:salmon;}
+}
+
+
+
+
