@@ -407,95 +407,95 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
 
     }
 
-    function meanSumCheck(arr, start, num) {
-        var output = 0;
-        if (start + num <= arr.length) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((arr[start + i].value > arr[start + i].currAvg) ? 1 : -1);
-            }
-        }
-        return output;
-    }
-    function revMeanSumCheck(arr, start, num) {
-        var output = 0;
-        if (start - num >= 0) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((arr[start - i].value > arr[start - i].currAvg) ? 1 : -1);
-            }
-        }
-        return output;
-    }
-    function trendSumCheck(arr, start, num) {
-        var output = 0;
-        if (start + num < arr.length) {
-            for (var i = 0; i < num; i++) {
-                var curr = arr[start + i].value;
-                var next = arr[start + i + 1].value;
-                var signal = ((curr <= next) ? 1 : -1);
-                output = output + signal;
-            }
-        }
-        return output;
-    }
-    function revTrendSumCheck(arr, start, num) {
-        var output = 0;
-        if (start + num < arr.length) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((arr[start - i].value <= arr[start - i - 1].value) ? 1 : -1);
-            }
-        }
-        return output;
-    }
+    // function meanSumCheck(arr, start, num) {
+    //     var output = 0;
+    //     if (start + num <= arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((arr[start + i].value > arr[start + i].currAvg) ? 1 : -1);
+    //         }
+    //     }
+    //     return output;
+    // }
+    // function revMeanSumCheck(arr, start, num) {
+    //     var output = 0;
+    //     if (start - num >= 0) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((arr[start - i].value > arr[start - i].currAvg) ? 1 : -1);
+    //         }
+    //     }
+    //     return output;
+    // }
+    // function trendSumCheck(arr, start, num) {
+    //     var output = 0;
+    //     if (start + num < arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             var curr = arr[start + i].value;
+    //             var next = arr[start + i + 1].value;
+    //             var signal = ((curr <= next) ? 1 : -1);
+    //             output = output + signal;
+    //         }
+    //     }
+    //     return output;
+    // }
+    // function revTrendSumCheck(arr, start, num) {
+    //     var output = 0;
+    //     if (start + num < arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((arr[start - i].value <= arr[start - i - 1].value) ? 1 : -1);
+    //         }
+    //     }
+    //     return output;
+    // }
 
-    function closeToMean(arr, start, num) {
-        var output = 0;
-        if (start + num < arr.length) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((Math.abs(arr[start + i].value - arr[start + i].currAvg) <= arr[start + i].currSigma) ? 1 : -1);
-            }
-        }
-        return output;
+    // function closeToMean(arr, start, num) {
+    //     var output = 0;
+    //     if (start + num < arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((Math.abs(arr[start + i].value - arr[start + i].currAvg) <= arr[start + i].currSigma) ? 1 : -1);
+    //         }
+    //     }
+    //     return output;
 
-    }
+    // }
 
-    function nearUCLCheck(arr,start,num)
-    {
-        var output = 0
-        if (start + num <= arr.length) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((arr[start + i].value  >= 2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
-            }
-            if(output>=2){
-                for (var i = 0; i < num; i++) {
-                    if(arr[start + i].value>= (2*arr[start + i].currSigma + arr[start + i].currAvg)){
-                        arr[start + i].nearUCLCheck = 1;
-                    }
+    // function nearUCLCheck(arr,start,num)
+    // {
+    //     var output = 0
+    //     if (start + num <= arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((arr[start + i].value  >= 2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+    //         }
+    //         if(output>=2){
+    //             for (var i = 0; i < num; i++) {
+    //                 if(arr[start + i].value>= (2*arr[start + i].currSigma + arr[start + i].currAvg)){
+    //                     arr[start + i].nearUCLCheck = 1;
+    //                 }
                     
-                }  
-            }
+    //             }  
+    //         }
         
-        }
-        return output;
-    }
-    function nearLCLCheck(arr,start,num)
-    {
-        var output = 0
-        if (start + num <= arr.length) {
-            for (var i = 0; i < num; i++) {
-                output = output + ((arr[start + i].value  <= -2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
-            }
-            if(output>=2){
-                for (var i = 0; i < num; i++) {
-                    if(arr[start + i].value<= (-2*arr[start + i].currSigma + arr[start + i].currAvg)){
-                        arr[start + i].nearLCLCheck = 1;
-                    }
+    //     }
+    //     return output;
+    // }
+    // function nearLCLCheck(arr,start,num)
+    // {
+    //     var output = 0
+    //     if (start + num <= arr.length) {
+    //         for (var i = 0; i < num; i++) {
+    //             output = output + ((arr[start + i].value  <= -2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+    //         }
+    //         if(output>=2){
+    //             for (var i = 0; i < num; i++) {
+    //                 if(arr[start + i].value<= (-2*arr[start + i].currSigma + arr[start + i].currAvg)){
+    //                     arr[start + i].nearLCLCheck = 1;
+    //                 }
                     
-                }  
-            }
+    //             }  
+    //         }
         
-        }
-        return output;
-    }
+    //     }
+    //     return output;
+    // }
 
     function dateFromQlikNumber(n) {
         var d = new Date((n - 25569) * 86400 * 1000);
