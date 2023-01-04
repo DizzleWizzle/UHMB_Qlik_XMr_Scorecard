@@ -1,4 +1,4 @@
-define(["qlik", "jquery", "./d3.min", "text!./style.css"], function (qlik, $, d3) {
+define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"], function (qlik, $, d3) {
     'use strict';
     return function ($element, layout) {
 
@@ -208,118 +208,119 @@ define(["qlik", "jquery", "./d3.min", "text!./style.css"], function (qlik, $, d3
         var higherbetter = ((data[data.length - 1].isHigherGood == 1) ? true : false);
         var calcPoints = data[data.length - 1].calcpoints;
         var showSPC = data[data.length - 1].ShowSPC;
-
-        if (calcPoints > data.length) {
-            calcPoints = data.length;
-        }
-
-        var initData = JSON.parse(JSON.stringify(data));
-        initData.length = calcPoints;
-
-        //calculate Moving range on trimmed dataset
-        initData.forEach(function (d, i) {
-            d.value = d.value;
-            if (i > 0) {
-                d.MR = Math.abs(d.value - data[i - 1].value);
-            }
-        });
-
-        var unique = [...new Set(data.map(item => item.reCalcID))];
-        var Holding = [];
-        unique.forEach((ID) => {
-            var temp = data.filter(x => x.reCalcID == ID);
-            Holding.push(temp);
-            temp = null;
-        });
-
-        Holding.forEach((group) => {
-            var trimmed = JSON.parse(JSON.stringify(group));
-            if (trimmed.length >= calcPoints && calcPoints > 0) {
-                trimmed.length = calcPoints;
-            }
-
-            trimmed.forEach(function (d, i) {
-                //d.dim = dateFromQlikNumber(d.dim);
-                //d.value = d.value;
-                if (i > 0) {
-                    d.MR = Math.abs(d.value - trimmed[i - 1].value);
-                }
-            });
-            var xAvg = d3.mean(getFields(trimmed, "value"));
-            var xMR = d3.mean(getFields(trimmed, "MR"));
-            var xUCL = (xMR / 1.128 * 3) + xAvg;
-            var xLCL = xAvg - (xMR / 1.128 * 3);
-            //				if (clunderzero == false){
-            //					if(xLCL < 0){
-            //						xLCL = 0;
-            //					}
-            //				}
-            var xSigma = xMR / 1.128;
-
-            group.forEach((row) => {
-                row.currAvg = xAvg;
-                row.currUCL = xUCL;
-                row.currLCL = xLCL;
-                row.currSigma = xSigma;
-            });
-
-        });
-
-        try {
-            var myAvg = d3.mean(getFields(initData, "value")); //i => i.value);
-        } catch (err) {
-            console.log(err);
-        }
-
-        /*		var mySD = d3.deviation(getFields(initData,"value"));//i => i.value);
-        var myMR = d3.mean(getFields(initData,"MR"));//i => i.MR);
-        var myUCL = (myMR/1.128*3) + myAvg;
-        var myLCL = myAvg - (myMR/1.128*3);
-        var mySigma = myMR/1.128;
-         */
         var runlength = 7;
         var trendlength = 7;
-        var prevValue;
-        try {
-            data.forEach(function (d, i) {
-                d.dim = dateFromQlikNumber(d.dim);
-                d.value = d.value;
-                if (i > 0) {
-                    d.MR = d.value - data[i - 1].value;
-                }
-                var meansum = meanSumCheck(data, i, runlength);
-                var revmeansum = revMeanSumCheck(data, i, runlength);
-                var trendsum = trendSumCheck(data, i, trendlength - 1);
-                var closetomean = closeToMean(data, i, 15);
-                if (meansum == runlength || revmeansum == runlength || ((i > 0) && (data[i - 1].check == 1 && d.value > d.currAvg))) {
-                    d.check = 1;
-                } else if (meansum == -runlength || revmeansum == -runlength || ((i > 0) && (data[i - 1].check == -1 && d.value < d.currAvg))) {
-                    d.check = -1;
-                } else {
-                    d.check = 0;
-                }
-                if (trendsum >= (trendlength - 1) || ((i > 0) && (data[i - 1].asctrendcheck == 1 && d.value > data[i - 1].value))) {
-                    d.asctrendcheck = 1;
-                } else {
-                    d.asctrendcheck = 0;
-                }
-                if (trendsum <= -1 * (trendlength - 1) || ((i > 0) && (data[i - 1].desctrendcheck == 1 && d.value < data[i - 1].value))) {
-                    d.desctrendcheck = 1;
-                } else {
-                    d.desctrendcheck = 0;
-                }
-                if (closetomean == 15 || ((i > 0) && (data[i - 1].closetomean == 1 && data[i - 1].currSigma > Math.abs(data[i - 1].currAvg - d.value)))) {
-                    d.closetomean = 1;
-                } else {
-                    d.closetomean = 0;
-                }
+        var x = processDataArray(data,runlength,trendlength,true,calcPoints,15,true);
+        // if (calcPoints > data.length) {
+        //     calcPoints = data.length;
+        // }
 
-                prevValue = d.value;
+        // var initData = JSON.parse(JSON.stringify(data));
+        // initData.length = calcPoints;
 
-            });
-        } catch (err) {
-            console.log(err);
-        }
+        // //calculate Moving range on trimmed dataset
+        // initData.forEach(function (d, i) {
+        //     d.value = d.value;
+        //     if (i > 0) {
+        //         d.MR = Math.abs(d.value - data[i - 1].value);
+        //     }
+        // });
+
+        // var unique = [...new Set(data.map(item => item.reCalcID))];
+        // var Holding = [];
+        // unique.forEach((ID) => {
+        //     var temp = data.filter(x => x.reCalcID == ID);
+        //     Holding.push(temp);
+        //     temp = null;
+        // });
+
+        // Holding.forEach((group) => {
+        //     var trimmed = JSON.parse(JSON.stringify(group));
+        //     if (trimmed.length >= calcPoints && calcPoints > 0) {
+        //         trimmed.length = calcPoints;
+        //     }
+
+        //     trimmed.forEach(function (d, i) {
+        //         //d.dim = dateFromQlikNumber(d.dim);
+        //         //d.value = d.value;
+        //         if (i > 0) {
+        //             d.MR = Math.abs(d.value - trimmed[i - 1].value);
+        //         }
+        //     });
+        //     var xAvg = d3.mean(getFields(trimmed, "value"));
+        //     var xMR = d3.mean(getFields(trimmed, "MR"));
+        //     var xUCL = (xMR / 1.128 * 3) + xAvg;
+        //     var xLCL = xAvg - (xMR / 1.128 * 3);
+        //     //				if (clunderzero == false){
+        //     //					if(xLCL < 0){
+        //     //						xLCL = 0;
+        //     //					}
+        //     //				}
+        //     var xSigma = xMR / 1.128;
+
+        //     group.forEach((row) => {
+        //         row.currAvg = xAvg;
+        //         row.currUCL = xUCL;
+        //         row.currLCL = xLCL;
+        //         row.currSigma = xSigma;
+        //     });
+
+        // });
+
+        // try {
+        //     var myAvg = d3.mean(getFields(initData, "value")); //i => i.value);
+        // } catch (err) {
+        //     console.log(err);
+        // }
+
+        // /*		var mySD = d3.deviation(getFields(initData,"value"));//i => i.value);
+        // var myMR = d3.mean(getFields(initData,"MR"));//i => i.MR);
+        // var myUCL = (myMR/1.128*3) + myAvg;
+        // var myLCL = myAvg - (myMR/1.128*3);
+        // var mySigma = myMR/1.128;
+        //  */
+        
+        // var prevValue;
+        // try {
+        //     data.forEach(function (d, i) {
+        //         d.dim = dateFromQlikNumber(d.dim);
+        //         d.value = d.value;
+        //         if (i > 0) {
+        //             d.MR = d.value - data[i - 1].value;
+        //         }
+        //         var meansum = meanSumCheck(data, i, runlength);
+        //         var revmeansum = revMeanSumCheck(data, i, runlength);
+        //         var trendsum = trendSumCheck(data, i, trendlength - 1);
+        //         var closetomean = closeToMean(data, i, 15);
+        //         if (meansum == runlength || revmeansum == runlength || ((i > 0) && (data[i - 1].check == 1 && d.value > d.currAvg))) {
+        //             d.check = 1;
+        //         } else if (meansum == -runlength || revmeansum == -runlength || ((i > 0) && (data[i - 1].check == -1 && d.value < d.currAvg))) {
+        //             d.check = -1;
+        //         } else {
+        //             d.check = 0;
+        //         }
+        //         if (trendsum >= (trendlength - 1) || ((i > 0) && (data[i - 1].asctrendcheck == 1 && d.value > data[i - 1].value))) {
+        //             d.asctrendcheck = 1;
+        //         } else {
+        //             d.asctrendcheck = 0;
+        //         }
+        //         if (trendsum <= -1 * (trendlength - 1) || ((i > 0) && (data[i - 1].desctrendcheck == 1 && d.value < data[i - 1].value))) {
+        //             d.desctrendcheck = 1;
+        //         } else {
+        //             d.desctrendcheck = 0;
+        //         }
+        //         if (closetomean == 15 || ((i > 0) && (data[i - 1].closetomean == 1 && data[i - 1].currSigma > Math.abs(data[i - 1].currAvg - d.value)))) {
+        //             d.closetomean = 1;
+        //         } else {
+        //             d.closetomean = 0;
+        //         }
+
+        //         prevValue = d.value;
+
+        //     });
+        // } catch (err) {
+        //     console.log(err);
+        // }
 
         var specvaricon = [{
                 filename: "speccausehighimp.png",
@@ -362,6 +363,14 @@ define(["qlik", "jquery", "./d3.min", "text!./style.css"], function (qlik, $, d3
             specindex = 1;
         } else if (data[data.length - 1].asctrendcheck == -1 && higherbetter == true) {
             specindex = 2;
+        } else if (data[data.length - 1].nearUCLCheck == 1 && higherbetter == true) {
+            specindex = 0;
+        } else if (data[data.length - 1].nearLCLCheck == 1 && higherbetter == true) {
+            specindex = 2;
+        } else if (data[data.length - 1].nearLCLCheck == 1 && higherbetter == false) {
+            specindex = 3;
+        } else if (data[data.length - 1].nearUCLCheck == 1 && higherbetter == false) {
+            specindex = 1;
         } else {
             specindex = 4;
         }
@@ -447,6 +456,45 @@ define(["qlik", "jquery", "./d3.min", "text!./style.css"], function (qlik, $, d3
         }
         return output;
 
+    }
+
+    function nearUCLCheck(arr,start,num)
+    {
+        var output = 0
+        if (start + num <= arr.length) {
+            for (var i = 0; i < num; i++) {
+                output = output + ((arr[start + i].value  >= 2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+            }
+            if(output>=2){
+                for (var i = 0; i < num; i++) {
+                    if(arr[start + i].value>= (2*arr[start + i].currSigma + arr[start + i].currAvg)){
+                        arr[start + i].nearUCLCheck = 1;
+                    }
+                    
+                }  
+            }
+        
+        }
+        return output;
+    }
+    function nearLCLCheck(arr,start,num)
+    {
+        var output = 0
+        if (start + num <= arr.length) {
+            for (var i = 0; i < num; i++) {
+                output = output + ((arr[start + i].value  <= -2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+            }
+            if(output>=2){
+                for (var i = 0; i < num; i++) {
+                    if(arr[start + i].value<= (-2*arr[start + i].currSigma + arr[start + i].currAvg)){
+                        arr[start + i].nearLCLCheck = 1;
+                    }
+                    
+                }  
+            }
+        
+        }
+        return output;
     }
 
     function dateFromQlikNumber(n) {
