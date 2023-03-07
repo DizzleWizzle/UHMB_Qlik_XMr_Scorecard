@@ -1,65 +1,167 @@
-.needed-for-unknown-reasons {
+.needed-for-unknown-reasons {}
+
+.qv-uhmb-ScoreCard {
+	display: flex;
+	flex-direction: column;
+	z-index: 2;
+	padding: 2px;
 }
-.qv-uhmb-ScoreCard{
-display: flex;
-  	flex-direction: column;
-}
-.qv-uhmb-ScoreCard .innerSC{
-	
+
+.qv-uhmb-ScoreCard .innerSC {
+
 	flex: 1;
 	display: flex;
-  	flex-direction: column;
-	
+	flex-direction: column;
+
 }
 
-.qv-uhmb-ScoreCard .innerSC .tableCont{
-	margin:5px;
+.qv-uhmb-ScoreCard .innerSC .tableCont {
+	margin: 5px;
 	flex: 1;
 }
 
-.qv-uhmb-ScoreCard .innerSC .bigTitleSC{
-	text-align:center;
-	font-size:35px;
+.qv-uhmb-ScoreCard .innerSC .bigTitleSC {
+	text-align: center;
+	font-size: 35px;
 }
-.qv-uhmb-ScoreCard .innerSC .subTitleSC{
-	text-align:center;
-	font-size:15px;
+
+.qv-uhmb-ScoreCard .innerSC .subTitleSC {
+	text-align: center;
+	font-size: 15px;
 }
 
 
-div.qv-uhmb-ScoreCard  table td, div.qv-uhmb-ScoreCard  table th{
-  	border: 1px solid black;
-  	border-collapse: collapse;
-  	background-color: white;
+div.qv-uhmb-ScoreCard table td,
+div.qv-uhmb-ScoreCard table th {
+	border: 1px solid black;
+	border-collapse: collapse;
+	background-color: white;
 	vertical-align: middle;
 }
 
-div.qv-uhmb-ScoreCard  table{
-	height:100%;
+div.qv-uhmb-ScoreCard table {
+	height: 100%;
 }
 
 
-div.qv-uhmb-ScoreCard  table td{
-	padding:2px;
+div.qv-uhmb-ScoreCard table td {
+	padding: 2px;
+}
+
+div.qv-uhmb-ScoreCard .ScorecardModal {
+	position: absolute;
+	text-align: left;
+	padding: 10px;
+	font: 14px sans-serif;
+	color: white;
+	background: rgba(105, 105, 105,0.9);
+	border: 1px;
+	border-radius: 4px;
+	z-index: 99;
+	width: calc(100% - 20px);
+	height: calc(100% - 20px);
+	display: none;
+}
+
+div.qv-uhmb-ScoreCard .svgcontainer {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	opacity: 1;
+}
+
+div.qv-uhmb-ScoreCard svg {
+	position: relative;
+	opacity: 1;
+	z-index: 99;
+}
+
+div.qv-uhmb-ScoreCard .line {
+	fill: none;
+	stroke: #A6A6A6;
+	stroke-width: 2px;
+}
+
+div.qv-uhmb-ScoreCard .avgline {
+	fill: none;
+	stroke: black;
+	stroke-width: 1px;
+
+}
+
+div.qv-uhmb-ScoreCard .CLline {
+	fill: none;
+	stroke: lightslategray;
+	stroke-dasharray: 5, 5;
+	stroke-width: 1px;
+}
+
+div.qv-uhmb-ScoreCard .targetline {
+	fill: none;
+	stroke: red;
+	stroke-dasharray: 5, 5;
+	stroke-width: 1px;
+}
+
+div.qv-uhmb-ScoreCard .lineDash {
+	stroke-dasharray: 5, 5;
+}
+
+div.qv-uhmb-ScoreCard .dot {
+	fill: #A6A6A6;
+	stroke: #A6A6A6;
+	stroke-width: 1.5px;
+}
+
+div.qv-uhmb-ScoreCard .negative {
+	fill: #E46C0A;
+	stroke: #E46C0A;
+}
+
+div.qv-uhmb-ScoreCard .positive {
+	fill: blue;
+	stroke: blue;
+}
+
+div.qv-uhmb-ScoreCard .purple {
+	fill: purple;
+	stroke: purple;
+}
+
+div.qv-uhmb-ScoreCard .highlight {
+	fill: red;
 }
 
 
 
 /* Safari 4.0 - 8.0 */
 @-webkit-keyframes redflash {
-  0%   {background-color:salmon;}
-  50%  {background-color:white;}
-  100% {background-color:salmon;}
+	0% {
+		background-color: salmon;
+	}
+
+	50% {
+		background-color: white;
+	}
+
+	100% {
+		background-color: salmon;
+	}
 
 }
 
 /* Standard syntax */
 @keyframes redflash {
-  0%   {background-color:salmon;}
-  50%  {background-color:white;}
-  100% {background-color:salmon;}
+	0% {
+		background-color: salmon;
+	}
+
+	50% {
+		background-color: white;
+	}
+
+	100% {
+		background-color: salmon;
+	}
 }
-
-
-
-

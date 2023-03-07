@@ -1,5 +1,5 @@
-define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"], function (qlik, $, d3) {
-    'use strict';
+define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"], function (qlik, $, d3) {
+    //'use strict';
     return function ($element, layout) {
 
         var numMeasure = layout.qHyperCube.qMeasureInfo.length;
@@ -12,11 +12,11 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
         });
         while (numRows < totalRows) {
             var requestPage = [{
-                    qTop: 0 + numRows,
-                    qLeft: 0,
-                    qWidth: 10, //should be # of columns
-                    qHeight: dataPageHeight //this.backendApi.getRowCount()
-                }
+                qTop: 0 + numRows,
+                qLeft: 0,
+                qWidth: 10, //should be # of columns
+                qHeight: dataPageHeight //this.backendApi.getRowCount()
+            }
             ];
             TempData.push(this.backendApi.getData(requestPage));
             numRows = numRows + dataPageHeight;
@@ -49,7 +49,13 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
             }
 
             var maincontainer = document.getElementById(id);
-            var qMatrix = fullData;
+            var modal = d3.select("#" + id).append("div")
+                .attr('id', 'ScorecardModal')
+                .attr("class", "ScorecardModal")
+                ;
+            var qMatrix = fullData.filter(function (f) {
+                return f[1].qNum != 'NaN' && f[8].qNum != 'NaN';
+            });
 
             if (numMeasure == 7) {
                 var data = qMatrix
@@ -57,6 +63,7 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
                         return {
                             "Metric": d[0].qText,
                             "Date": d[1].qNum,
+                            "dim": d[1].qNum,
                             "TargetValue": d[2].qNum,
                             "isHigherGood": d[3].qNum,
                             "calcpoints": d[4].qNum,
@@ -76,6 +83,7 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
                     return {
                         "Metric": d[0].qText,
                         "Date": d[1].qNum,
+                        "dim": d[1].qNum,
                         "TargetValue": d[2].qNum,
                         "isHigherGood": d[3].qNum,
                         "calcpoints": d[4].qNum,
@@ -93,6 +101,8 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
 
             }
 
+
+
             data.sort(function (a, b) {
                 return a.KPIOrder - b.KPIOrder
             });
@@ -106,15 +116,16 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
             var fontsize = 'font-size: 14px;';
             var spcsize = '30px'
 
-                if (!layout.DefFont) {
-                    font = 'font-family: ' + layout.customFont + ';';
-                    fontsize = 'font-size: ' + layout.customFontSize + ';';
-                    spcsize = layout.customSPCSize;
+            if (!layout.DefFont) {
+                font = 'font-family: ' + layout.customFont + ';';
+                fontsize = 'font-size: ' + layout.customFontSize + ';';
+                spcsize = layout.customSPCSize;
 
-                }
+            }
 
-                var BGCol = layout.BGCol.color;
+            var BGCol = layout.BGCol.color;
             var TitleCol = layout.TitleCol.color;
+            var ShowPopup = layout.ShowPopup;
 
             var innerDiv = $("<div />;").addClass("innerSC");
             innerDiv.css('background-color', BGCol);
@@ -131,6 +142,7 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
             var tableHeader = $(`<tr style="height:35px;"><th>Metric</th><th>Plan</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr>`);
             tableHeader.appendTo(table);
 
+            var arrayIterator = 0;
             for (const [key, value] of Object.entries(splitArr)) {
                 value.sort(function (a, b) {
                     return a.Date - b.Date
@@ -157,9 +169,13 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
                     var targetentry = 'N/A';
                     var taricon = '';
                 }
-                //	if(value[value.length-1].ShowSPC == 1)
-                //	{
-                var varicon = '<img src = "/extensions/' + extName + '/' + SPCIcons[0].filename + '" width="' + spcsize + '">';
+
+                var imgclick = '';
+                if (value[value.length - 1].ShowSPC != 1) {
+                    imgclick = '_null';
+                }
+
+                var varicon = `<img id="${id}_${arrayIterator}" src = "/extensions/${extName}/${SPCIcons[0].filename}" width="${spcsize}" class="VarIcon${imgclick}" iterno = "${arrayIterator}">`;
                 //	}
                 //	else{
                 //		var varicon = '';
@@ -177,15 +193,53 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
                     }
                 }
 
-                var $tableRowContent = $(`<td>${key}</td><td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length-1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
+                var $tableRowContent = $(`<td>${key}</td><td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
                 $tableRowContent.appendTo($tableRow);
                 $tableRow.appendTo(table);
+
+                var SVGheight = Math.min(300, height * 0.8);
+                var chartSVG = modal
+                    .append("div")
+                    .attr("class", "svgcontainer")
+                    .style("width", "100%")
+                    .attr("id", `svgc_${arrayIterator}`)
+                    .append("svg")
+                    .attr("width", "100%")
+                    .attr("height", SVGheight)
+                    ;
+
+
+                BuildXMR(value, width, SVGheight - 50, chartSVG);
+
+                arrayIterator = arrayIterator + 1;
 
             }
             var tablecont = $(`<div />;`).addClass("tableCont");
             table.appendTo(tablecont);
             tablecont.appendTo(innerDiv);
-            innerDiv.appendTo(maincontainer);
+            innerDiv.prependTo(maincontainer);
+
+            if (ShowPopup == true) {
+
+
+                $(`#${id} .VarIcon`).click(function () {
+                    // modal.transition()
+                    // .duration(500)
+                    // .style("opacity", 0.95);
+                    $(`#${id} .ScorecardModal`).show();
+
+                    $(`#${id} .svgcontainer`).hide();
+                    console.log($(this).attr('iterno'));
+                    $(`#${id} #svgc_${$(this).attr('iterno')}`).show();
+                });
+
+                $(`#${id} .ScorecardModal`).children().click(function () {
+                    // modal.transition()
+                    // .duration(500)
+                    // .style("opacity", 0);
+                    $(`#${id} .ScorecardModal`).hide();
+                });
+            }
 
             return qlik.Promise.resolve(); //needed for export
 
@@ -210,137 +264,28 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
         var showSPC = data[data.length - 1].ShowSPC;
         var runlength = 7;
         var trendlength = 7;
-        var x = processDataArray(data,runlength,trendlength,true,calcPoints,15,true);
-        // if (calcPoints > data.length) {
-        //     calcPoints = data.length;
-        // }
+        var x = processDataArray(data, runlength, trendlength, true, calcPoints, 15, true);
 
-        // var initData = JSON.parse(JSON.stringify(data));
-        // initData.length = calcPoints;
-
-        // //calculate Moving range on trimmed dataset
-        // initData.forEach(function (d, i) {
-        //     d.value = d.value;
-        //     if (i > 0) {
-        //         d.MR = Math.abs(d.value - data[i - 1].value);
-        //     }
-        // });
-
-        // var unique = [...new Set(data.map(item => item.reCalcID))];
-        // var Holding = [];
-        // unique.forEach((ID) => {
-        //     var temp = data.filter(x => x.reCalcID == ID);
-        //     Holding.push(temp);
-        //     temp = null;
-        // });
-
-        // Holding.forEach((group) => {
-        //     var trimmed = JSON.parse(JSON.stringify(group));
-        //     if (trimmed.length >= calcPoints && calcPoints > 0) {
-        //         trimmed.length = calcPoints;
-        //     }
-
-        //     trimmed.forEach(function (d, i) {
-        //         //d.dim = dateFromQlikNumber(d.dim);
-        //         //d.value = d.value;
-        //         if (i > 0) {
-        //             d.MR = Math.abs(d.value - trimmed[i - 1].value);
-        //         }
-        //     });
-        //     var xAvg = d3.mean(getFields(trimmed, "value"));
-        //     var xMR = d3.mean(getFields(trimmed, "MR"));
-        //     var xUCL = (xMR / 1.128 * 3) + xAvg;
-        //     var xLCL = xAvg - (xMR / 1.128 * 3);
-        //     //				if (clunderzero == false){
-        //     //					if(xLCL < 0){
-        //     //						xLCL = 0;
-        //     //					}
-        //     //				}
-        //     var xSigma = xMR / 1.128;
-
-        //     group.forEach((row) => {
-        //         row.currAvg = xAvg;
-        //         row.currUCL = xUCL;
-        //         row.currLCL = xLCL;
-        //         row.currSigma = xSigma;
-        //     });
-
-        // });
-
-        // try {
-        //     var myAvg = d3.mean(getFields(initData, "value")); //i => i.value);
-        // } catch (err) {
-        //     console.log(err);
-        // }
-
-        // /*		var mySD = d3.deviation(getFields(initData,"value"));//i => i.value);
-        // var myMR = d3.mean(getFields(initData,"MR"));//i => i.MR);
-        // var myUCL = (myMR/1.128*3) + myAvg;
-        // var myLCL = myAvg - (myMR/1.128*3);
-        // var mySigma = myMR/1.128;
-        //  */
-        
-        // var prevValue;
-        // try {
-        //     data.forEach(function (d, i) {
-        //         d.dim = dateFromQlikNumber(d.dim);
-        //         d.value = d.value;
-        //         if (i > 0) {
-        //             d.MR = d.value - data[i - 1].value;
-        //         }
-        //         var meansum = meanSumCheck(data, i, runlength);
-        //         var revmeansum = revMeanSumCheck(data, i, runlength);
-        //         var trendsum = trendSumCheck(data, i, trendlength - 1);
-        //         var closetomean = closeToMean(data, i, 15);
-        //         if (meansum == runlength || revmeansum == runlength || ((i > 0) && (data[i - 1].check == 1 && d.value > d.currAvg))) {
-        //             d.check = 1;
-        //         } else if (meansum == -runlength || revmeansum == -runlength || ((i > 0) && (data[i - 1].check == -1 && d.value < d.currAvg))) {
-        //             d.check = -1;
-        //         } else {
-        //             d.check = 0;
-        //         }
-        //         if (trendsum >= (trendlength - 1) || ((i > 0) && (data[i - 1].asctrendcheck == 1 && d.value > data[i - 1].value))) {
-        //             d.asctrendcheck = 1;
-        //         } else {
-        //             d.asctrendcheck = 0;
-        //         }
-        //         if (trendsum <= -1 * (trendlength - 1) || ((i > 0) && (data[i - 1].desctrendcheck == 1 && d.value < data[i - 1].value))) {
-        //             d.desctrendcheck = 1;
-        //         } else {
-        //             d.desctrendcheck = 0;
-        //         }
-        //         if (closetomean == 15 || ((i > 0) && (data[i - 1].closetomean == 1 && data[i - 1].currSigma > Math.abs(data[i - 1].currAvg - d.value)))) {
-        //             d.closetomean = 1;
-        //         } else {
-        //             d.closetomean = 0;
-        //         }
-
-        //         prevValue = d.value;
-
-        //     });
-        // } catch (err) {
-        //     console.log(err);
-        // }
 
         var specvaricon = [{
-                filename: "speccausehighimp.png",
-                description: "Special cause variation - improvement  (indicator where high is good)"
-            }, {
-                filename: "speccausehighconc.png",
-                description: "Special cause variation - cause for concern (indicator where high is a concern)"
-            }, {
-                filename: "speccauselowconc.png",
-                description: "Special cause variation - cause for concern (indicator where low is a concern)"
-            }, {
-                filename: "speccauselowimp.png",
-                description: "Special cause variation - improvement  (indicator where low is good)"
-            }, {
-                filename: "comcause.png",
-                description: "Common cause variation"
-            }, {
-                filename: "noSPC.png",
-                description: "N/A"
-            }
+            filename: "speccausehighimp.png",
+            description: "Special cause variation - improvement  (indicator where high is good)"
+        }, {
+            filename: "speccausehighconc.png",
+            description: "Special cause variation - cause for concern (indicator where high is a concern)"
+        }, {
+            filename: "speccauselowconc.png",
+            description: "Special cause variation - cause for concern (indicator where low is a concern)"
+        }, {
+            filename: "speccauselowimp.png",
+            description: "Special cause variation - improvement  (indicator where low is good)"
+        }, {
+            filename: "comcause.png",
+            description: "Common cause variation"
+        }, {
+            filename: "noSPC.png",
+            description: "N/A"
+        }
         ];
 
         var specindex;
@@ -376,18 +321,18 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
         }
 
         var targeticon = [{
-                filename: "consfail.png",
-                description: "The system is expected to consistently fail the target"
-            }, {
-                filename: "conspass.png",
-                description: "The system is expected to consistently pass the target"
-            }, {
-                filename: "randvar.png",
-                description: "The system may achieve or fail the target subject to random variation"
-            }, {
-                filename: "noSPC.png",
-                description: "N/A"
-            }
+            filename: "consfail.png",
+            description: "The system is expected to consistently fail the target"
+        }, {
+            filename: "conspass.png",
+            description: "The system is expected to consistently pass the target"
+        }, {
+            filename: "randvar.png",
+            description: "The system may achieve or fail the target subject to random variation"
+        }, {
+            filename: "noSPC.png",
+            description: "N/A"
+        }
         ];
 
         var targetindex;
@@ -407,95 +352,7 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
 
     }
 
-    // function meanSumCheck(arr, start, num) {
-    //     var output = 0;
-    //     if (start + num <= arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((arr[start + i].value > arr[start + i].currAvg) ? 1 : -1);
-    //         }
-    //     }
-    //     return output;
-    // }
-    // function revMeanSumCheck(arr, start, num) {
-    //     var output = 0;
-    //     if (start - num >= 0) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((arr[start - i].value > arr[start - i].currAvg) ? 1 : -1);
-    //         }
-    //     }
-    //     return output;
-    // }
-    // function trendSumCheck(arr, start, num) {
-    //     var output = 0;
-    //     if (start + num < arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             var curr = arr[start + i].value;
-    //             var next = arr[start + i + 1].value;
-    //             var signal = ((curr <= next) ? 1 : -1);
-    //             output = output + signal;
-    //         }
-    //     }
-    //     return output;
-    // }
-    // function revTrendSumCheck(arr, start, num) {
-    //     var output = 0;
-    //     if (start + num < arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((arr[start - i].value <= arr[start - i - 1].value) ? 1 : -1);
-    //         }
-    //     }
-    //     return output;
-    // }
 
-    // function closeToMean(arr, start, num) {
-    //     var output = 0;
-    //     if (start + num < arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((Math.abs(arr[start + i].value - arr[start + i].currAvg) <= arr[start + i].currSigma) ? 1 : -1);
-    //         }
-    //     }
-    //     return output;
-
-    // }
-
-    // function nearUCLCheck(arr,start,num)
-    // {
-    //     var output = 0
-    //     if (start + num <= arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((arr[start + i].value  >= 2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
-    //         }
-    //         if(output>=2){
-    //             for (var i = 0; i < num; i++) {
-    //                 if(arr[start + i].value>= (2*arr[start + i].currSigma + arr[start + i].currAvg)){
-    //                     arr[start + i].nearUCLCheck = 1;
-    //                 }
-                    
-    //             }  
-    //         }
-        
-    //     }
-    //     return output;
-    // }
-    // function nearLCLCheck(arr,start,num)
-    // {
-    //     var output = 0
-    //     if (start + num <= arr.length) {
-    //         for (var i = 0; i < num; i++) {
-    //             output = output + ((arr[start + i].value  <= -2*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
-    //         }
-    //         if(output>=2){
-    //             for (var i = 0; i < num; i++) {
-    //                 if(arr[start + i].value<= (-2*arr[start + i].currSigma + arr[start + i].currAvg)){
-    //                     arr[start + i].nearLCLCheck = 1;
-    //                 }
-                    
-    //             }  
-    //         }
-        
-    //     }
-    //     return output;
-    // }
 
     function dateFromQlikNumber(n) {
         var d = new Date((n - 25569) * 86400 * 1000);
@@ -517,11 +374,11 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
         var TempData = [];
         while (numRows < totalRows) {
             var requestPage = [{
-                    qTop: 1 + numRows,
-                    qLeft: 0,
-                    qWidth: 10, //should be # of columns
-                    qHeight: dataPageHeight //this.backendApi.getRowCount()
-                }
+                qTop: 1 + numRows,
+                qLeft: 0,
+                qWidth: 10, //should be # of columns
+                qHeight: dataPageHeight //this.backendApi.getRowCount()
+            }
             ];
             this.backendApi.getData(requestPage).then(function (dataPages) {
                 TempData.push(dataPages);
@@ -533,6 +390,165 @@ define(["qlik", "jquery", "./d3.min","./SPCArrayFunctions", "text!./style.css"],
             console.log(TempData);
         }
         return Promise.all(TempData);
+    }
+
+    function BuildXMR(data, w, h, svg) {
+
+
+        var higherbetternum = data[0].isHigherGood;
+        var higherbetter;
+        if (higherbetternum == 0) {
+            higherbetter = false;
+        }
+        else if (higherbetternum == 1) {
+            higherbetter = true;
+        }
+        else {
+            higherbetter = higherbetternum;
+        }
+        var width = w - 70, height = h - 10;
+        var x = d3.scaleTime().range([0, width]);
+        var y = d3.scaleLinear().range([height, 0]);
+
+        var limitpadding = (d3.max(data, function (d) {
+            return d.currUCL;
+        }) - d3.min(data, function (d) {
+            return d.currAvg;
+        })) * 0.1; // figure to pad the limits of the y-axis
+
+        var uppery = Math.max(d3.max(data, function (d) {
+            return d.currUCL;
+        }), d3.max(data, function (d) {
+            return d.value;
+        })
+        ) + limitpadding;
+        var lowery = Math.min(d3.min(data, function (d) {
+            return d.currLCL;
+        }), d3.min(data, function (d) {
+            return d.value;
+        })) - limitpadding;
+
+        if (data[0].HasTarget == 1) {
+            uppery = Math.max(uppery, data[0].TargetValue);
+            lowery = Math.min(lowery, data[0].TargetValue);
+        }
+
+        var valueline = d3.line()
+            .x(function (d) {
+                return x(d.dim);
+            })
+            .y(function (d) {
+                return y(d.value);
+            });
+        var avgline = d3.line()
+            .x(function (d) {
+                return x(d.dim);
+            })
+            .y(function (d) {
+                return y(d.currAvg);
+            });
+        var UCLline = d3.line()
+            .x(function (d) {
+                return x(d.dim);
+            })
+            .y(function (d) {
+                return y(d.currUCL);
+            });
+        var LCLline = d3.line()
+            .x(function (d) {
+                return x(d.dim);
+            })
+            .y(function (d) {
+                return y(d.currLCL);
+            });
+        var targetline = d3.line()
+            .x(function (d) {
+                return x(d.dim);
+            })
+            .y(function (d) {
+                return y(d.TargetValue);
+            });
+
+        x.domain(d3.extent(data, function (d) {
+            return d.dim;
+        }));
+        y.domain([Math.min(lowery, d3.min(data, function (d) {
+            return d.value;
+        })), Math.max(d3.max(data, function (d) {
+            return d.value;
+        }), uppery)]);
+
+        //horrible hacky way to truncate title lengths
+        var svgtitle = data[0].Metric;
+        if (svgtitle.length*6.5 > width ){
+            svgtitle = svgtitle.substring(0,Math.floor(width/6.5)) +'...';
+        }
+
+        svg.append("rect")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("fill", "white");
+        svg.append("text").text(`${svgtitle}`)
+            .style("fill", "black")
+            .attr("x", 10).attr("y", 20);
+        var g = svg.append("g")
+            .attr("alignment-baseline", "central")
+            .attr("transform", "translate(30,30)")
+            ;
+
+        g.append("path")
+            .data([data])
+            .attr("class", "line")
+            .attr("d", valueline)
+            ;
+        g.append("path")
+            .data([data])
+            .attr("class", "CLline")
+            .attr("d", UCLline);
+        g.append("path")
+            .data([data])
+            .attr("class", "CLline")
+            .attr("d", LCLline);
+        g.append("path")
+            .data([data])
+            .attr("class", "avgline")
+            .attr("d", avgline);
+        if (data[0].HasTarget == 1) {
+            g.append("path")
+                .data([data])
+                .attr("class", "targetline")
+                .attr("d", targetline);
+        }
+
+        g.selectAll(".dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("class", "dot")
+            .classed("positive", function (d) {
+                if (posiCheck(higherbetternum, d) == "Positive" && higherbetternum < 2) {
+                    return true;
+                }
+                return false;
+            })
+            .classed("negative", function (d) {
+                if (posiCheck(higherbetternum, d) == "Negative" && higherbetternum < 2) {
+                    return true;
+                }
+                return false;
+            })
+            .classed("purple", function (d) {
+                if (posiCheck(higherbetternum, d) == "Purple" && higherbetternum > 1) {
+                    return true;
+                }
+                return false;
+            })
+            .attr("cx", valueline.x())
+            .attr("cy", valueline.y())
+            .attr("r", 3.5)
+            ;
+
+
     }
 
 });
