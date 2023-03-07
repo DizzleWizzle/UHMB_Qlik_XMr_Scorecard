@@ -29,3 +29,5 @@ Works on SaaS and Enterprise for Windows (as of August 2022)
   * Table Font Size - inject css into font-size: css property
   * SPC Icon Size - set the size of the img of SPC icon
  * Enable Popup on Icon click - clicking on the Variation icon will pop up a simplified XMr chart of the metric, click the popup to dismiss
+
+![scorecard demo](https://user-images.githubusercontent.com/111445780/223478173-7938fe72-803d-44ee-87ac-193c6c9af935.gif)
