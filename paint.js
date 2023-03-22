@@ -139,7 +139,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             //		console.log(splitArr);
 
             var table = $(`<table style="${fontsize} ${font}"></table>`);
-            var tableHeader = $(`<tr style="height:35px;"><th>Metric</th><th>Plan</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr>`);
+            var tableHeader = $(`<tr style="height:35px;"><th>Metric</th><th>Target</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr>`);
             tableHeader.appendTo(table);
 
             var arrayIterator = 0;
