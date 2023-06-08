@@ -126,6 +126,11 @@ define(['./getMasterItems', './getAppSheets', './getDimensions', './d3.min'], fu
 							about3: {
 								component: "text",
 								label: "Measure Order: Target>Is Higher Good (1/0)?>Number of Calculation Points for SPC>Use Target(1/0)>Show SPC Icons(1/0)>Order of KPI's> Value > Recalculation ID (optional) "
+							},
+							about4: {
+								component: "link",
+								label: "GitHub for Extension",
+								url: "https://github.com/DizzleWizzle/UHMB_Qlik_XMr_Scorecard"
 							}
 						}
 					}
