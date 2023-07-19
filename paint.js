@@ -334,10 +334,10 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             description: "N/A"
         }, {
             filename: "recentpass.png",
-            description: "The system has passed the target for the past 6 data points but limits havent crossed the target value"
+            description: "Metric has (P)assed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target"
         }, {
             filename: "recentfail.png",
-            description: "The system has failed the target for the past 6 data points but limits havent crossed the target value"
+            description: "Metric has (F)ailed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target"
         }
         ];
 
