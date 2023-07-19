@@ -101,6 +101,13 @@ define(['./getMasterItems', './getAppSheets', './getDimensions', './d3.min'], fu
 								label: "Enable Popup on Icon Click",
 								ref: "ShowPopup",
 								defaultValue: false
+							},
+							ExtraAssurance: {
+								ref: "ExtraAssurance",
+								type: "string",
+								label: "Show Extra Assurance Icons (0/1)",
+								expression: "optional",
+								defaultValue: "0"
 							}
 						}
 					}

@@ -157,9 +157,9 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 } else {
                     var direction = "&#9664;&#9654;";
                 }
-                var SPCIcons = getSPCSymbols(value);
+                var SPCIcons = getSPCSymbols(value,layout.ExtraAssurance);
 
-                var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}">`;
+                var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}" title= "${SPCIcons[1].description}">`;
 
                 if (value[value.length - 1].HasTarget == 1) {
                     var targetentry = value[value.length - 1].formattedTarget;
@@ -175,7 +175,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                     imgclick = '_null';
                 }
 
-                var varicon = `<img id="${id}_${arrayIterator}" src = "/extensions/${extName}/${SPCIcons[0].filename}" width="${spcsize}" class="VarIcon${imgclick}" iterno = "${arrayIterator}">`;
+                var varicon = `<img id="${id}_${arrayIterator}" src = "/extensions/${extName}/${SPCIcons[0].filename}" width="${spcsize}" title= "${SPCIcons[0].description}" class="VarIcon${imgclick}" iterno = "${arrayIterator}">`;
                 //	}
                 //	else{
                 //		var varicon = '';
@@ -257,7 +257,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             return res;
         }, {});
     }
-    function getSPCSymbols(data) {
+    function getSPCSymbols(data,extraAssurance) {
         var targetvalue = data[data.length - 1].TargetValue;
         var higherbetter = ((data[data.length - 1].isHigherGood == 1) ? true : false);
         var calcPoints = data[data.length - 1].calcpoints;
@@ -332,9 +332,24 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
         }, {
             filename: "noSPC.png",
             description: "N/A"
+        }, {
+            filename: "recentpass.png",
+            description: "The system has passed the target for the past 6 data points but limits havent crossed the target value"
+        }, {
+            filename: "recentfail.png",
+            description: "The system has failed the target for the past 6 data points but limits havent crossed the target value"
         }
         ];
 
+        var recentCount = 0;
+            for( var q =1; q<=6; q++){
+                if ((higherbetter == true && data[data.length - q].value > targetvalue) || (higherbetter == false && data[data.length - q].value < targetvalue)) {
+                    recentCount++;
+                }else if ((higherbetter == true && data[data.length - q].value < targetvalue) || (higherbetter == false && data[data.length - q].value > targetvalue)) {
+                    recentCount--;
+                }
+            }
+        
         var targetindex;
         if (showSPC == 0) {
             targetindex = 3;
@@ -342,7 +357,13 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             targetindex = 1;
         } else if ((higherbetter == true && data[data.length - 1].currUCL < targetvalue) || (higherbetter == false && data[data.length - 1].currLCL > targetvalue)) {
             targetindex = 0;
-        } else {
+        } else if (recentCount == 6 && extraAssurance == 1){
+            targetindex = 4;
+        } else if (recentCount == -6 && extraAssurance == 1){
+            targetindex = 5;
+        }
+        
+        else {
             targetindex = 2;
         }
 
