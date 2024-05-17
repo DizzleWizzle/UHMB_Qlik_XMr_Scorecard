@@ -73,7 +73,8 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                             "value": d[8].qNum,
                             "formattedValue": d[8].qText,
                             "formattedTarget": d[2].qText,
-                            "reCalcID": ''
+                            "reCalcID": '',
+                            "DateText": d[1].qText
 
                         }
                     });
@@ -94,6 +95,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                         "formattedValue": d[8].qText,
                         "formattedTarget": d[2].qText,
                         "reCalcID": d[9].qText,
+                        "DateText": d[1].qText
 
                     }
 
@@ -126,22 +128,38 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             var BGCol = layout.BGCol.color;
             var TitleCol = layout.TitleCol.color;
             var ShowPopup = layout.ShowPopup;
+            var maxOrScroll = ((NullEmptyUndefCheck( layout.maxOrScroll)) ? 'Expand' : layout.maxOrScroll);
+            var showDate = ((NullEmptyUndefCheck(layout.ShowUptoDate)) ? false : layout.ShowUptoDate);
+            var dateName = ((NullEmptyUndefCheck(layout.customUptoName)) ? 'Latest': layout.customUptoName);
+
+            console.log(maxOrScroll);
+            console.log(showDate);
+            console.log(dateName);
+
 
             var innerDiv = $("<div />;").addClass("innerSC");
             innerDiv.css('background-color', BGCol);
-
+            var topflex = $("<div />;").addClass("TopFlex");
             var bigTitle = $(`<h1>${Title}</h1>`).addClass("bigTitleSC").css('color', TitleCol);
             var subTitle = $(`<h3>${subTitle}</h3>`).addClass("subTitleSC").css('color', TitleCol);
-            bigTitle.appendTo(innerDiv);
-            subTitle.appendTo(innerDiv);
+            bigTitle.appendTo(topflex);
+            subTitle.appendTo(topflex);
+            topflex.appendTo(innerDiv);
 
             var splitArr = group(data);
             //		console.log(splitArr);
 
             var table = $(`<table style="${fontsize} ${font}"></table>`);
-            var tableHeader = $(`<tr style="height:35px;"><th>Metric</th><th>Target</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr>`);
+            if(maxOrScroll == 'Expand'){
+                table.addClass('expandmax');
+            }
+            var thDateCol = '';
+            if(showDate == true){
+                thDateCol = `<th>${dateName}</th>`;
+            }
+            var tableHeader = $(`<thead><tr style="height:35px;"><th>Metric</th>${thDateCol}<th>Target</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr></thead>`);
             tableHeader.appendTo(table);
-
+            var tableBody = $(`<tbody></tbody>`);
             var arrayIterator = 0;
             for (const [key, value] of Object.entries(splitArr)) {
                 value.sort(function (a, b) {
@@ -192,10 +210,13 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                         targetCol = 'red';
                     }
                 }
-
-                var $tableRowContent = $(`<td>${key}</td><td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
+                var tdDateCol='';
+                if(showDate == true){
+                    tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
+                }
+                var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
                 $tableRowContent.appendTo($tableRow);
-                $tableRow.appendTo(table);
+                $tableRow.appendTo(tableBody);
 
                 var SVGheight = Math.min(300, height * 0.8);
                 var chartSVG = modal
@@ -214,6 +235,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 arrayIterator = arrayIterator + 1;
 
             }
+            tableBody.appendTo(table);
             var tablecont = $(`<div />;`).addClass("tableCont");
             table.appendTo(tablecont);
             tablecont.appendTo(innerDiv);
@@ -411,6 +433,9 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             console.log(TempData);
         }
         return Promise.all(TempData);
+    }
+    function NullEmptyUndefCheck(value){
+        return value === undefined || value === null || value ==='';
     }
 
     function BuildXMR(data, w, h, svg) {
