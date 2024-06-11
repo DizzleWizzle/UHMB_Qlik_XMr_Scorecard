@@ -108,6 +108,34 @@ define(['./getMasterItems', './getAppSheets', './getDimensions', './d3.min'], fu
 								label: "Show Extra Assurance Icons (0/1)",
 								expression: "optional",
 								defaultValue: "0"
+							},
+							ShowUptoDate: {
+								ref: "ShowUptoDate",
+								type: "boolean",
+								label: "Show Upto/Latest Date Column",
+								defaultValue: false
+							},
+							UptoDateName: {
+								type: "string",
+								label: "Custom Upto column name",
+								ref: "customUptoName",
+								show: function (data) {
+									return data.ShowUptoDate;
+								}
+							},
+							MaxOrScroll: {
+								type: "string",
+								component: "dropdown",
+								label: "Expand/Scroll",
+								ref: "maxOrScroll",
+								options: [{
+									value: "Expand",
+									label: "Expand"
+								}, {
+									value: "Grow",
+									label: "Grow"
+								}],
+								defaultValue: "Expand"
 							}
 						}
 					}
