@@ -28,7 +28,12 @@ Works on SaaS and Enterprise for Windows (as of August 2022)
   * Table Font - inject css into the font-family: css property
   * Table Font Size - inject css into font-size: css property
   * SPC Icon Size - set the size of the img of SPC icon
- * Enable Popup on Icon click - clicking on the Variation icon will pop up a simplified XMr chart of the metric, click the popup to dismiss
- * Show Extra Assurance Icons (0/1) - Defaults to 0, changing to 1 will enable 2 extra icons (recentfail.png and recentpass.png) that trigger when the 6 most recent points fail/pass but the limits are not yet crossing the target value
+
+* Enable Popup on Icon click - clicking on the Variation icon will pop up a simplified XMr chart of the metric, click the popup to dismiss
+* Show Extra Assurance Icons - Set this to show additional assurance icons where a target has been hit 6 times in a row but CL's havent yet moved far enough.
+* Show Upto/Latest Column - adds a column for each row showing the latest date value for that Metric (format of date follows the format provided in Dimensions)
+  *  Custom Column name - this appears if you want something other than 'Latest' as the column heading
+* Expand/Scroll - if set to Expand the rows will auto expand to fill the available space,then start to scroll, if set to Grow, they will be at minimum extent and the height will grow dependant on number of metrics. 
+
 
 ![scorecard demo](https://user-images.githubusercontent.com/111445780/223478173-7938fe72-803d-44ee-87ac-193c6c9af935.gif)
