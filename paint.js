@@ -128,13 +128,13 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             var BGCol = layout.BGCol.color;
             var TitleCol = layout.TitleCol.color;
             var ShowPopup = layout.ShowPopup;
-            var maxOrScroll = ((NullEmptyUndefCheck( layout.maxOrScroll)) ? 'Expand' : layout.maxOrScroll);
+            var maxOrScroll = ((NullEmptyUndefCheck(layout.maxOrScroll)) ? 'Expand' : layout.maxOrScroll);
             var showDate = ((NullEmptyUndefCheck(layout.ShowUptoDate)) ? false : layout.ShowUptoDate);
-            var dateName = ((NullEmptyUndefCheck(layout.customUptoName)) ? 'Latest': layout.customUptoName);
+            var dateName = ((NullEmptyUndefCheck(layout.customUptoName)) ? 'Latest' : layout.customUptoName);
 
-            console.log(maxOrScroll);
-            console.log(showDate);
-            console.log(dateName);
+            // console.log(maxOrScroll);
+            // console.log(showDate);
+            // console.log(dateName);
 
 
             var innerDiv = $("<div />;").addClass("innerSC");
@@ -150,11 +150,11 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             //		console.log(splitArr);
 
             var table = $(`<table style="${fontsize} ${font}"></table>`);
-            if(maxOrScroll == 'Expand'){
+            if (maxOrScroll == 'Expand') {
                 table.addClass('expandmax');
             }
             var thDateCol = '';
-            if(showDate == true){
+            if (showDate == true) {
                 thDateCol = `<th>${dateName}</th>`;
             }
             var tableHeader = $(`<thead><tr style="height:35px;"><th>Metric</th>${thDateCol}<th>Target</th><th>Actual</th><th>Variation</th><th>Assurance</th></tr></thead>`);
@@ -175,7 +175,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 } else {
                     var direction = "&#9664;&#9654;";
                 }
-                var SPCIcons = getSPCSymbols(value,layout.ExtraAssurance);
+                var SPCIcons = getSPCSymbols(value, layout.ExtraAssurance);
 
                 var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}" title= "${SPCIcons[1].description}">`;
 
@@ -210,8 +210,8 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                         targetCol = 'red';
                     }
                 }
-                var tdDateCol='';
-                if(showDate == true){
+                var tdDateCol = '';
+                if (showDate == true) {
                     tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
                 }
                 var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
@@ -279,7 +279,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             return res;
         }, {});
     }
-    function getSPCSymbols(data,extraAssurance) {
+    function getSPCSymbols(data, extraAssurance) {
         var targetvalue = data[data.length - 1].TargetValue;
         var higherbetter = ((data[data.length - 1].isHigherGood == 1) ? true : false);
         var calcPoints = data[data.length - 1].calcpoints;
@@ -364,27 +364,27 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
         ];
 
         var recentCount = 0;
-            for( var q =1; q<=6; q++){
-                if ((higherbetter == true && data[data.length - q].value > targetvalue) || (higherbetter == false && data[data.length - q].value < targetvalue)) {
-                    recentCount++;
-                }else if ((higherbetter == true && data[data.length - q].value < targetvalue) || (higherbetter == false && data[data.length - q].value > targetvalue)) {
-                    recentCount--;
-                }
+        for (var q = 1; q <= 6; q++) {
+            if ((higherbetter == true && data[data.length - q].value >= targetvalue) || (higherbetter == false && data[data.length - q].value <= targetvalue)) {
+                recentCount++;
+            } else if ((higherbetter == true && data[data.length - q].value < targetvalue) || (higherbetter == false && data[data.length - q].value > targetvalue)) {
+                recentCount--;
             }
-        
+        }
+
         var targetindex;
         if (showSPC == 0) {
             targetindex = 3;
-        } else if ((higherbetter == true && data[data.length - 1].currLCL > targetvalue) || (higherbetter == false && data[data.length - 1].currUCL < targetvalue)) {
+        } else if ((higherbetter == true && data[data.length - 1].currLCL >= targetvalue) || (higherbetter == false && data[data.length - 1].currUCL <= targetvalue)) {
             targetindex = 1;
-        } else if ((higherbetter == true && data[data.length - 1].currUCL < targetvalue) || (higherbetter == false && data[data.length - 1].currLCL > targetvalue)) {
+        } else if ((higherbetter == true && data[data.length - 1].currUCL <= targetvalue) || (higherbetter == false && data[data.length - 1].currLCL >= targetvalue)) {
             targetindex = 0;
-        } else if (recentCount == 6 && extraAssurance == 1){
+        } else if (recentCount == 6 && extraAssurance == 1) {
             targetindex = 4;
-        } else if (recentCount == -6 && extraAssurance == 1){
+        } else if (recentCount == -6 && extraAssurance == 1) {
             targetindex = 5;
         }
-        
+
         else {
             targetindex = 2;
         }
@@ -429,13 +429,13 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             });
             numRows = numRows + dataPageHeight;
 
-            console.log(numRows);
-            console.log(TempData);
+            // console.log(numRows);
+            // console.log(TempData);
         }
         return Promise.all(TempData);
     }
-    function NullEmptyUndefCheck(value){
-        return value === undefined || value === null || value ==='';
+    function NullEmptyUndefCheck(value) {
+        return value === undefined || value === null || value === '';
     }
 
     function BuildXMR(data, w, h, svg) {
@@ -526,8 +526,8 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
         //horrible hacky way to truncate title lengths
         var svgtitle = data[0].Metric;
-        if (svgtitle.length*6.5 > width ){
-            svgtitle = svgtitle.substring(0,Math.floor(width/6.5)) +'...';
+        if (svgtitle.length * 6.5 > width) {
+            svgtitle = svgtitle.substring(0, Math.floor(width / 6.5)) + '...';
         }
 
         svg.append("rect")
