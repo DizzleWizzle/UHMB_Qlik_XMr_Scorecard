@@ -211,14 +211,6 @@ function getFields(input, field) {
     return output;
 }
 function posiCheck(higherbetter, d) {
-    if ((d.check == 1 && higherbetter == true) || (d.check == -1 && higherbetter == false) || (d.value > d.currUCL && higherbetter == true) || (d.value < d.currLCL && higherbetter == false)) {
-        return "Positive";
-
-    }
-    if ((d.check == 1 && higherbetter == false) || (d.check == -1 && higherbetter == true) || (d.value > d.currUCL && higherbetter == false) || (d.value < d.currLCL && higherbetter == true)) {
-        return "Negative";
-
-    }
     if ((d.asctrendcheck == 1 && higherbetter == true) || (d.desctrendcheck == 1 && higherbetter == false)) {
         return "Positive";
 
@@ -227,17 +219,33 @@ function posiCheck(higherbetter, d) {
         return "Negative";
 
     }
-    if ((d.check == 1 && higherbetter == 2) || (d.check == -1 && higherbetter == 2) || (d.value > d.currUCL && higherbetter == 2) || (d.value < d.currLCL && higherbetter == 2) || (d.asctrendcheck == 1 && higherbetter == 2) || (d.desctrendcheck == 1 && higherbetter == 2) || (d.nearLCLCheck == 1 && higherbetter == 2)|| (d.nearUCLCheck == 1 && higherbetter == 2)) {
+    if ((d.check == 1 && higherbetter == true) || (d.check == -1 && higherbetter == false) || (d.value > d.currUCL && higherbetter == true) || (d.value < d.currLCL && higherbetter == false)) {
+        return "Positive";
+
+    }
+    if ((d.check == 1 && higherbetter == false) || (d.check == -1 && higherbetter == true) || (d.value > d.currUCL && higherbetter == false) || (d.value < d.currLCL && higherbetter == true)) {
+        return "Negative";
+
+    }
+
+    if ((d.check == 1 && higherbetter == 2) || (d.check == -1 && higherbetter == 2) || (d.value > d.currUCL && higherbetter == 2) || (d.value < d.currLCL && higherbetter == 2) || (d.asctrendcheck == 1 && higherbetter == 2) || (d.desctrendcheck == 1 && higherbetter == 2) || (d.nearLCLCheck == 1 && higherbetter == 2) || (d.nearUCLCheck == 1 && higherbetter == 2)) {
         return "Purple";
 
     }
-    if((d.nearLCLCheck == 1 && higherbetter == false)|| d.nearUCLCheck == 1 && higherbetter == true  ){
+    if ((d.nearLCLCheck == 1 && higherbetter == false) || d.nearUCLCheck == 1 && higherbetter == true) {
         return "Positive";
-    } 
-    if((d.nearLCLCheck == 1 && higherbetter == true)|| d.nearUCLCheck == 1 && higherbetter == false ){
+    }
+    if ((d.nearLCLCheck == 1 && higherbetter == true) || d.nearUCLCheck == 1 && higherbetter == false) {
         return "Negative";
-    } 
+    }
+    if ( (d.value > d.currUCL && higherbetter == true) || (d.value < d.currLCL && higherbetter == false)) {
+        return "Positive";
 
+    }
+    if ( (d.value > d.currUCL && higherbetter == false) || (d.value < d.currLCL && higherbetter == true)) {
+        return "Negative";
+
+    }
     return "None";
 
 }
