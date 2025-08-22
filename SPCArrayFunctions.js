@@ -157,18 +157,18 @@ function nearUCLCheck(arr,start,num)
     var abovemean = 0;
     if (start + num <= arr.length) {
         for (var i = 0; i < num; i++) {
-            output = output + ((arr[start + i].value  >= 2*arr[start + i].currSigma + arr[start + i].currAvg  && arr[start + i].value  <= 3*arr[start + i].currSigma + arr[start + i].currAvg) ? 1 : 0);
-            abovemean = abovemean + ((arr[start + i].value  >= arr[start + i].currAvg ) ? 1 : 0);
+            output = output + ((arr[start + i].value >= 2 * arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+            abovemean = abovemean + ((arr[start + i].value >= arr[start + i].currAvg) ? 1 : 0);
         }
-        if(output>=2 && abovemean ==3){
+        if (output >= 2 && abovemean == 3) {
             for (var i = 0; i < num; i++) {
-                if(arr[start + i].value>= (2*arr[start + i].currSigma + arr[start + i].currAvg) && arr[start + i].value  <= (3*arr[start + i].currSigma + arr[start + i].currAvg)){
+                if (arr[start + i].value >= (2 * arr[start + i].currSigma + arr[start + i].currAvg) ) {
                     arr[start + i].nearUCLCheck = 1;
                 }
-                
-            }  
+
+            }
         }
-    
+
     }
     return output;
 }
@@ -178,18 +178,18 @@ function nearLCLCheck(arr,start,num)
     var belowmean = 0;
     if (start + num <= arr.length) {
         for (var i = 0; i < num; i++) {
-            output = output + ((arr[start + i].value  <= -2*arr[start + i].currSigma + arr[start + i].currAvg && arr[start + i].value  >= -3*arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
-            belowmean = belowmean + ((arr[start + i].value  <= arr[start + i].currAvg ) ? 1 : 0);
+            output = output + ((arr[start + i].value <= -2 * arr[start + i].currSigma + arr[start + i].currAvg ) ? 1 : 0);
+            belowmean = belowmean + ((arr[start + i].value <= arr[start + i].currAvg) ? 1 : 0);
         }
-        if(output>=2 && belowmean == 3){
+        if (output >= 2 && belowmean == 3) {
             for (var i = 0; i < num; i++) {
-                if(arr[start + i].value<= (-2*arr[start + i].currSigma + arr[start + i].currAvg) && arr[start + i].value  >= -3*arr[start + i].currSigma + arr[start + i].currAvg){
+                if (arr[start + i].value <= (-2 * arr[start + i].currSigma + arr[start + i].currAvg) ) {
                     arr[start + i].nearLCLCheck = 1;
                 }
-                
-            }  
+
+            }
         }
-    
+
     }
     return output;
 }
