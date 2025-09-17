@@ -167,38 +167,6 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 });
                 // 			console.log(`${key} latest: ${value[value.length-1].value}`);
                 var $tableRow = $("<tr />");
-                if (value[value.length - 1].value < value[value.length - 2].value) {
-                    var direction = "&#9660;";
-
-                } else if (value[value.length - 1].value > value[value.length - 2].value) {
-                    var direction = "&#9650;";
-                } else {
-                    var direction = "&#9664;&#9654;";
-                }
-                var SPCIcons = getSPCSymbols(value, layout.ExtraAssurance);
-
-                var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}" title= "${SPCIcons[1].description}">`;
-
-                if (value[value.length - 1].HasTarget == 1) {
-                    var targetentry = value[value.length - 1].formattedTarget;
-                    //			var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}">`;
-
-                } else {
-                    var targetentry = 'N/A';
-                    var taricon = '';
-                }
-
-                var imgclick = '';
-                if (value[value.length - 1].ShowSPC != 1) {
-                    imgclick = '_null';
-                }
-
-                var varicon = `<img id="${id}_${arrayIterator}" src = "/extensions/${extName}/${SPCIcons[0].filename}" width="${spcsize}" title= "${SPCIcons[0].description}" class="VarIcon${imgclick}" iterno = "${arrayIterator}">`;
-                //	}
-                //	else{
-                //		var varicon = '';
-                //		var taricon = '';
-                //	}
 
                 var targetCol = '';
                 if (value[value.length - 1].HasTarget == 1) {
@@ -210,27 +178,74 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                         targetCol = 'red';
                     }
                 }
-                var tdDateCol = '';
-                if (showDate == true) {
-                    tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
+                if (value[value.length - 1].HasTarget == 1) {
+                    var targetentry = value[value.length - 1].formattedTarget;
+                    //			var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}">`;
+
+                } else {
+                    var targetentry = 'N/A';
+                    var taricon = '';
                 }
-                var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
+                //add in section to check length of split data array
+
+                if (value.length >= 15) {
+
+
+                    if (value[value.length - 1].value < value[value.length - 2].value) {
+                        var direction = "&#9660;";
+
+                    } else if (value[value.length - 1].value > value[value.length - 2].value) {
+                        var direction = "&#9650;";
+                    } else {
+                        var direction = "&#9664;&#9654;";
+                    }
+                    var SPCIcons = getSPCSymbols(value, layout.ExtraAssurance);
+
+                    var taricon = `<img src = "/extensions/${extName}/${SPCIcons[1].filename}" width="${spcsize}" title= "${SPCIcons[1].description}">`;
+
+
+
+                    var imgclick = '';
+                    if (value[value.length - 1].ShowSPC != 1) {
+                        imgclick = '_null';
+                    }
+
+                    var varicon = `<img id="${id}_${arrayIterator}" src = "/extensions/${extName}/${SPCIcons[0].filename}" width="${spcsize}" title= "${SPCIcons[0].description}" class="VarIcon${imgclick}" iterno = "${arrayIterator}">`;
+                    //	}
+                    //	else{
+                    //		var varicon = '';
+                    //		var taricon = '';
+                    //	}
+
+
+                    var tdDateCol = '';
+                    if (showDate == true) {
+                        tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
+                    }
+                    var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
+                    if (ShowPopup == true) {
+                        var SVGheight = Math.min(300, height * 0.8);
+                        var chartSVG = modal
+                            .append("div")
+                            .attr("class", "svgcontainer")
+                            .style("width", "100%")
+                            .attr("id", `svgc_${arrayIterator}`)
+                            .append("svg")
+                            .attr("width", "100%")
+                            .attr("height", SVGheight)
+                            ;
+
+
+                        BuildXMR(value, width, SVGheight - 50, chartSVG);
+                    }
+
+                } else {
+                    var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td colspan="2" style="text-align:center;">Not Enough Data for SPC</td>`);
+                }
                 $tableRowContent.appendTo($tableRow);
                 $tableRow.appendTo(tableBody);
 
-                var SVGheight = Math.min(300, height * 0.8);
-                var chartSVG = modal
-                    .append("div")
-                    .attr("class", "svgcontainer")
-                    .style("width", "100%")
-                    .attr("id", `svgc_${arrayIterator}`)
-                    .append("svg")
-                    .attr("width", "100%")
-                    .attr("height", SVGheight)
-                    ;
 
-
-                BuildXMR(value, width, SVGheight - 50, chartSVG);
 
                 arrayIterator = arrayIterator + 1;
 
@@ -251,7 +266,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                     $(`#${id} .ScorecardModal`).show();
 
                     $(`#${id} .svgcontainer`).hide();
-                    console.log($(this).attr('iterno'));
+                    //console.log($(this).attr('iterno'));
                     $(`#${id} #svgc_${$(this).attr('iterno')}`).show();
                 });
 
@@ -320,13 +335,13 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             specindex = 1;
         } else if (data[data.length - 1].desctrendcheck == 1 && higherbetter == true) {
             specindex = 2;
-        } else if ((data[data.length - 1].check == 1 && higherbetter == true) ) {
+        } else if ((data[data.length - 1].check == 1 && higherbetter == true)) {
             specindex = 0;
-        } else if ((data[data.length - 1].check == -1 && higherbetter == false) ) {
+        } else if ((data[data.length - 1].check == -1 && higherbetter == false)) {
             specindex = 3;
-        } else if ((data[data.length - 1].check == 1 && higherbetter == false) ) {
+        } else if ((data[data.length - 1].check == 1 && higherbetter == false)) {
             specindex = 1;
-        } else if ((data[data.length - 1].check == -1 && higherbetter == true) ) {
+        } else if ((data[data.length - 1].check == -1 && higherbetter == true)) {
             specindex = 2;
         } else if (data[data.length - 1].nearUCLCheck == 1 && higherbetter == true) {
             specindex = 0;
@@ -336,7 +351,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             specindex = 3;
         } else if (data[data.length - 1].nearUCLCheck == 1 && higherbetter == false) {
             specindex = 1;
-        } else if ( (data[data.length - 1].value > data[data.length - 1].currUCL && higherbetter == true)) {
+        } else if ((data[data.length - 1].value > data[data.length - 1].currUCL && higherbetter == true)) {
             specindex = 0;
         } else if ((data[data.length - 1].value < data[data.length - 1].currLCL && higherbetter == false)) {
             specindex = 3;
@@ -349,8 +364,8 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
         else {
             specindex = 4;
         }
-        console.log(specindex);
-        console.log(data[data.length -1]);
+        //console.log(specindex);
+        //console.log(data[data.length - 1]);
 
         // if (showSPC == 0) {
         //     specindex = 5;
