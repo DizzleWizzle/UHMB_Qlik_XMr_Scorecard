@@ -136,6 +136,20 @@ define(['./getMasterItems', './getAppSheets', './getDimensions', './d3.min'], fu
 									label: "Grow"
 								}],
 								defaultValue: "Expand"
+							},
+							SortByIcon: {
+								type: "string",
+								component: "dropdown",
+								label: "Sort by concern icons",
+								ref: "sortbyicon",
+								options: [{
+									value: "No",
+									label: "No"
+								}, {
+									value: "Yes",
+									label: "Yes"
+								}],
+								defaultValue: "No"
 							}
 						}
 					}

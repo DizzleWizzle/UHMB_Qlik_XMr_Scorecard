@@ -131,7 +131,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             var maxOrScroll = ((NullEmptyUndefCheck(layout.maxOrScroll)) ? 'Expand' : layout.maxOrScroll);
             var showDate = ((NullEmptyUndefCheck(layout.ShowUptoDate)) ? false : layout.ShowUptoDate);
             var dateName = ((NullEmptyUndefCheck(layout.customUptoName)) ? 'Latest' : layout.customUptoName);
-
+            var UHMBSorting = ((NullEmptyUndefCheck(layout.sortbyicon)) ? 'No' : layout.sortbyicon);
             // console.log(maxOrScroll);
             // console.log(showDate);
             // console.log(dateName);
@@ -270,10 +270,14 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
             }
             tableBody.appendTo(table);
-            var tableString = table[0].outerHTML;
-            tableString = sortTableHtmlStringByDataAttribute(tableString, 'uhmbsorting', false);
+            if(UHMBSorting == 'Yes'){
+                var tableString = table[0].outerHTML;
+                tableString = sortTableHtmlStringByDataAttribute(tableString, 'uhmbsorting', false);
 
-            table = $(`${tableString}`);
+                table = $(`${tableString}`);
+
+            }
+            
 
             var tablecont = $(`<div />;`).addClass("tableCont");
             table.appendTo(tablecont);
