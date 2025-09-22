@@ -271,9 +271,10 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
             }
             tableBody.appendTo(table);
             if(UHMBSorting == 'Yes'){
+                //convert the jquery object to text for the function to convert to DOM object
                 var tableString = table[0].outerHTML;
                 tableString = sortTableHtmlStringByDataAttribute(tableString, 'uhmbsorting', false);
-
+                //recreate the jquery object with the outputted html string
                 table = $(`${tableString}`);
 
             }
@@ -697,6 +698,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
 
 function sortTableHtmlStringByDataAttribute(htmlString, dataAttribute, ascending = true) {
+    //probably a better way of doing this but not looked at most of this since it was written
     // Create a template and parse the HTML string
     const template = document.createElement('template');
     template.innerHTML = htmlString.trim();
