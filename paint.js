@@ -242,6 +242,25 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 } else {
                     var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td colspan="2" style="text-align:center;">Not Enough Data for SPC</td>`);
                 }
+                var rowSort;
+                if(value.length < 15){
+                    rowSort = 0;
+                }else if(SPCIcons[0].colour == 'orange' && SPCIcons[1].colour == 'orange'){
+                    rowSort = 12;
+                } 
+                 else if(SPCIcons[0].colour == 'orange'|| SPCIcons[1].colour == 'orange'){
+                    rowSort = 10;
+                } else if(SPCIcons[0].colour == 'grey'&& SPCIcons[1].colour == 'grey') {
+                    rowSort = 5;
+                } else if(SPCIcons[0].colour == 'blue'&& SPCIcons[1].colour == 'blue'){
+                    rowSort = 2;
+                }
+                 else if(SPCIcons[0].colour == 'blue'|| SPCIcons[1].colour == 'blue'){
+                    rowSort = 3;
+                } else if (SPCIcons[0].colour == 'white'|| SPCIcons[1].colour == 'white'){
+                    rowSort = 1;
+                }
+                $tableRow.attr("data-UHMBsorting",rowSort);
                 $tableRowContent.appendTo($tableRow);
                 $tableRow.appendTo(tableBody);
 
@@ -251,6 +270,11 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
             }
             tableBody.appendTo(table);
+            var tableString = table[0].outerHTML;
+            tableString = sortTableHtmlStringByDataAttribute(tableString, 'uhmbsorting', false);
+
+            table = $(`${tableString}`);
+
             var tablecont = $(`<div />;`).addClass("tableCont");
             table.appendTo(tablecont);
             tablecont.appendTo(innerDiv);
@@ -306,28 +330,35 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
         var specvaricon = [{
             filename: "speccausehighimp.png",
-            description: "Special cause variation - improvement  (indicator where high is good)"
+            description: "Special cause variation - improvement  (indicator where high is good)",
+            colour: 'blue'
         }, {
             filename: "speccausehighconc.png",
-            description: "Special cause variation - cause for concern (indicator where high is a concern)"
+            description: "Special cause variation - cause for concern (indicator where high is a concern)",
+            colour: 'orange'
         }, {
             filename: "speccauselowconc.png",
-            description: "Special cause variation - cause for concern (indicator where low is a concern)"
+            description: "Special cause variation - cause for concern (indicator where low is a concern)",
+            colour: 'orange'
         }, {
             filename: "speccauselowimp.png",
-            description: "Special cause variation - improvement  (indicator where low is good)"
+            description: "Special cause variation - improvement  (indicator where low is good)",
+            colour: 'blue'
         }, {
             filename: "comcause.png",
-            description: "Common cause variation"
+            description: "Common cause variation",
+            colour: 'grey'
         }, {
             filename: "noSPC.png",
-            description: "N/A"
+            description: "N/A",
+            colour: 'white'
         }
         ];
 
         var specindex;
-
-        if (data[data.length - 1].asctrendcheck == 1 && higherbetter == true) {
+        if (showSPC == 0) {
+            specindex = 5;
+        } else if (data[data.length - 1].asctrendcheck == 1 && higherbetter == true) {
             specindex = 0;
         } else if (data[data.length - 1].desctrendcheck == 1 && higherbetter == false) {
             specindex = 3;
@@ -399,22 +430,28 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
         var targeticon = [{
             filename: "consfail.png",
-            description: "The system is expected to consistently fail the target"
+            description: "The system is expected to consistently fail the target",
+            colour: 'orange'
         }, {
             filename: "conspass.png",
-            description: "The system is expected to consistently pass the target"
+            description: "The system is expected to consistently pass the target",
+            colour: 'blue'
         }, {
             filename: "randvar.png",
-            description: "The system may achieve or fail the target subject to random variation"
+            description: "The system may achieve or fail the target subject to random variation",
+            colour: 'grey'
         }, {
             filename: "noSPC.png",
-            description: "N/A"
+            description: "N/A",
+            colour: 'white'
         }, {
             filename: "recentpass.png",
-            description: "Metric has (P)assed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target"
+            description: "Metric has (P)assed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target",
+            colour: 'blue'
         }, {
             filename: "recentfail.png",
-            description: "Metric has (F)ailed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target"
+            description: "Metric has (F)ailed the target for the last 6 (or more) data points, but the control limits have not moved above/below the target",
+            colour: 'orange'
         }
         ];
 
@@ -653,3 +690,37 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
     }
 
 });
+
+
+function sortTableHtmlStringByDataAttribute(htmlString, dataAttribute, ascending = true) {
+    // Create a template and parse the HTML string
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+  
+    // Find the first table element anywhere in the fragment
+    const table = template.content.querySelector('table');
+    if (!table) throw new Error('No <table> found in the HTML string.');
+  
+    // Use the first <tbody> if present, otherwise the table itself
+    const tbody = table.querySelector('tbody') || table;
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+  
+    rows.sort((a, b) => {
+      const aValue = a.dataset[dataAttribute];
+      const bValue = b.dataset[dataAttribute];
+      const aParsed = isNaN(aValue) ? aValue : parseFloat(aValue);
+      const bParsed = isNaN(bValue) ? bValue : parseFloat(bValue);
+  
+      if (aParsed < bParsed) return ascending ? -1 : 1;
+      if (aParsed > bParsed) return ascending ? 1 : -1;
+      return 0;
+    });
+  
+    // Remove old rows and append sorted rows
+    rows.forEach(row => tbody.appendChild(row));
+  
+    // Return the sorted table as a string
+    return table.outerHTML;
+  }
+  
+  
