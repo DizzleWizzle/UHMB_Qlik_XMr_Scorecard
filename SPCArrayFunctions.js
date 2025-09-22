@@ -90,7 +90,7 @@ function processDataArray(data,runlength ,trendlength,clunderzero,calcpoints,wit
         prevValue = d.value;
 
     });
-    console.log(data);
+ //   console.log(data);
     return Holding;
 }
 

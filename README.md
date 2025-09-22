@@ -34,6 +34,12 @@ Works on SaaS and Enterprise for Windows (as of August 2022)
 * Show Upto/Latest Column - adds a column for each row showing the latest date value for that Metric (format of date follows the format provided in Dimensions)
   *  Custom Column name - this appears if you want something other than 'Latest' as the column heading
 * Expand/Scroll - if set to Expand the rows will auto expand to fill the available space,then start to scroll, if set to Grow, they will be at minimum extent and the height will grow dependant on number of metrics. 
+* Sort by concern icons - this orders the metrics based on the variance/assurance icons in the following order:
+  *  Either variance or assurance is orange
+  *  Both variance and assurance are grey
+  *  either icon is blue
+  *  metrics with under 15 data points (no spc calculations)
+
 
 
 ![scorecard demo](https://user-images.githubusercontent.com/111445780/223478173-7938fe72-803d-44ee-87ac-193c6c9af935.gif)
