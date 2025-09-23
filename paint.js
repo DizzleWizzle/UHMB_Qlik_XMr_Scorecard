@@ -187,7 +187,10 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                     var taricon = '';
                 }
                 //add in section to check length of split data array
-
+                var tdDateCol = '';
+                if (showDate == true) {
+                    tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
+                }
                 if (value.length >= 15) {
 
 
@@ -218,10 +221,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                     //	}
 
 
-                    var tdDateCol = '';
-                    if (showDate == true) {
-                        tdDateCol = `<td>${value[value.length - 1].DateText}</td>`;
-                    }
+
                     var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td style="text-align:center;">${varicon}</td><td style="text-align:center;">${taricon}</td>`);
                     if (ShowPopup == true) {
                         var SVGheight = Math.min(300, height * 0.8);
@@ -243,24 +243,24 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                     var $tableRowContent = $(`<td>${key}</td>${tdDateCol}<td style="text-align:center;">${targetentry}</td><td style="color:${targetCol};text-align:center;">${value[value.length - 1].formattedValue}</td><td colspan="2" style="text-align:center;">Not Enough Data for SPC</td>`);
                 }
                 var rowSort;
-                if(value.length < 15){
+                if (value.length < 15) {
                     rowSort = 0;
-                }else if(SPCIcons[0].colour == 'orange' && SPCIcons[1].colour == 'orange'){
+                } else if (SPCIcons[0].colour == 'orange' && SPCIcons[1].colour == 'orange') {
                     rowSort = 12;
-                } 
-                 else if(SPCIcons[0].colour == 'orange'|| SPCIcons[1].colour == 'orange'){
+                }
+                else if (SPCIcons[0].colour == 'orange' || SPCIcons[1].colour == 'orange') {
                     rowSort = 10;
-                } else if(SPCIcons[0].colour == 'grey'&& SPCIcons[1].colour == 'grey') {
+                } else if (SPCIcons[0].colour == 'grey' && SPCIcons[1].colour == 'grey') {
                     rowSort = 5;
-                } else if(SPCIcons[0].colour == 'blue'&& SPCIcons[1].colour == 'blue'){
+                } else if (SPCIcons[0].colour == 'blue' && SPCIcons[1].colour == 'blue') {
                     rowSort = 2;
                 }
-                 else if(SPCIcons[0].colour == 'blue'|| SPCIcons[1].colour == 'blue'){
+                else if (SPCIcons[0].colour == 'blue' || SPCIcons[1].colour == 'blue') {
                     rowSort = 3;
-                } else if (SPCIcons[0].colour == 'white'|| SPCIcons[1].colour == 'white'){
+                } else if (SPCIcons[0].colour == 'white' || SPCIcons[1].colour == 'white') {
                     rowSort = 1;
                 }
-                $tableRow.attr("data-UHMBsorting",rowSort);
+                $tableRow.attr("data-UHMBsorting", rowSort);
                 $tableRowContent.appendTo($tableRow);
                 $tableRow.appendTo(tableBody);
 
@@ -270,7 +270,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
 
             }
             tableBody.appendTo(table);
-            if(UHMBSorting == 'Yes'){
+            if (UHMBSorting == 'Yes') {
                 //convert the jquery object to text for the function to convert to DOM object
                 var tableString = table[0].outerHTML;
                 tableString = sortTableHtmlStringByDataAttribute(tableString, 'uhmbsorting', false);
@@ -278,7 +278,7 @@ define(["qlik", "jquery", "./d3.min", "./SPCArrayFunctions", "text!./style.css"]
                 table = $(`${tableString}`);
 
             }
-            
+
 
             var tablecont = $(`<div />;`).addClass("tableCont");
             table.appendTo(tablecont);
@@ -702,31 +702,30 @@ function sortTableHtmlStringByDataAttribute(htmlString, dataAttribute, ascending
     // Create a template and parse the HTML string
     const template = document.createElement('template');
     template.innerHTML = htmlString.trim();
-  
+
     // Find the first table element anywhere in the fragment
     const table = template.content.querySelector('table');
     if (!table) throw new Error('No <table> found in the HTML string.');
-  
+
     // Use the first <tbody> if present, otherwise the table itself
     const tbody = table.querySelector('tbody') || table;
     const rows = Array.from(tbody.querySelectorAll('tr'));
-  
+
     rows.sort((a, b) => {
-      const aValue = a.dataset[dataAttribute];
-      const bValue = b.dataset[dataAttribute];
-      const aParsed = isNaN(aValue) ? aValue : parseFloat(aValue);
-      const bParsed = isNaN(bValue) ? bValue : parseFloat(bValue);
-  
-      if (aParsed < bParsed) return ascending ? -1 : 1;
-      if (aParsed > bParsed) return ascending ? 1 : -1;
-      return 0;
+        const aValue = a.dataset[dataAttribute];
+        const bValue = b.dataset[dataAttribute];
+        const aParsed = isNaN(aValue) ? aValue : parseFloat(aValue);
+        const bParsed = isNaN(bValue) ? bValue : parseFloat(bValue);
+
+        if (aParsed < bParsed) return ascending ? -1 : 1;
+        if (aParsed > bParsed) return ascending ? 1 : -1;
+        return 0;
     });
-  
+
     // Remove old rows and append sorted rows
     rows.forEach(row => tbody.appendChild(row));
-  
+
     // Return the sorted table as a string
     return table.outerHTML;
-  }
-  
-  
+}
+
